@@ -1,0 +1,77 @@
+---
+layout: default
+---
+
+<div class="hero-video">
+  <img
+    class="hero-video-poster"
+    src="{{ '/assets/images/Game.PNG' | relative_url }}"
+    alt=""
+  >
+
+  <video
+    class="hero-video-el"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="auto"
+    poster="{{ '/assets/images/Game.PNG' | relative_url }}"
+  >
+    <source src="{{ '/assets/videos/gameplay_60fps.mp4' | relative_url }}" type="video/mp4">
+  </video>
+
+  <div class="hero-video-overlay">
+    <div class="hero-video-content">
+      <p class="eyebrow">C++ SOFTWAREENTWICKLUNG · UNREAL ENGINE 5 · SOLO-PROJEKT</p>
+      <h1>{{ page.title }}</h1>
+      <p class="lead">
+        Entwicklung eines Survival-Spiels mit C++ und Unreal Engine 5 als Solo-Entwickler.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var video = document.querySelector('.hero-video-el');
+    var hero = document.querySelector('.hero-video');
+    if (!video) return;
+
+    var showVideo = function () {
+      hero.classList.add('video-ready');
+    };
+
+    if (video.readyState >= 3) {
+      showVideo();
+    } else {
+      video.addEventListener('canplay', showVideo, { once: true });
+    }
+
+    video.play().catch(function () {
+      hero.classList.add('video-failed');
+    });
+    video.addEventListener('error', function () {
+      hero.classList.add('video-failed');
+    });
+  })();
+</script>
+
+<div class="page-layout">
+
+  <aside class="toc" aria-label="Inhaltsverzeichnis">
+    <div class="toc-inner">
+      <span class="toc-label">CONTENTS</span>
+
+      <a href="#ueberblick" class="toc-link is-active">Überblick</a>
+      <a href="#architektur" class="toc-link">Architektur</a>
+      <a href="#groesste-herausforderung" class="toc-link">Die größte Herausforderung</a>
+      <a href="#fazit" class="toc-link">Fazit</a>
+    </div>
+  </aside>
+
+  <article class="content site-shell">
+    <div class="divider"></div>
+    {{ content }}
+  </article>
+</div>

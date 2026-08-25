@@ -96,7 +96,10 @@ By the second commit, these subclasses were already gone. Instead, there's a sin
 
 Since then, new resource types no longer require a dedicated C++ class — they're configured through the existing structure and data instead.
 
-![Description of the image](assets/images/Collectable.PNG)
+<div class="item-data-image">
+    <img src="assets/images/Collectable.PNG"
+         alt="Item DataTable">
+</div>
 
 ### Separating Responsibilities Through Components
 
@@ -295,12 +298,8 @@ This keeps the concrete DataTable access separate from the gameplay systems and 
 <br>
 #### Example: Item Data
 
-<div style="display: flex; gap: 20px; align-items: flex-start;">
-
-    <!-- Left side: Code -->
-    <div style="width: 50%;">
-        <div class="highlight">
-            <pre><code><span class="c1">// Data.h</span>
+<div class="highlight">
+    <pre><code><span class="c1">// Data.h</span>
 <span class="cpp-macro">USTRUCT</span><span class="p">(</span><span class="n">BlueprintType</span><span class="p">)</span>
 <span class="k">struct</span> <span class="cpp-class">FItem</span> <span class="p">:</span> <span class="k">public</span> <span class="cpp-class">FTableRowBase</span>
 <span class="p">{</span>
@@ -314,14 +313,11 @@ This keeps the concrete DataTable access separate from the gameplay systems and 
     <span class="k">int</span> <span class="n">Quantity</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
     <span class="cpp-class">FItemEffect</span> <span class="n">Effect</span><span class="p">;</span>
 <span class="p">};</span></code></pre>
-        </div>
-    </div>
+</div>
 
-    <!-- Right side: Image -->
-    <div style="width: 50%;">
-        <img src="assets/images/Brown_Cap.PNG" alt="Description" style="width: 100%; height: auto;">
-    </div>
-
+<div class="item-data-image">
+    <img src="assets/images/Brown_Cap.PNG"
+         alt="Item DataTable">
 </div>
 
 ### 4. Extracting the Interaction Logic

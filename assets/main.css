@@ -612,3 +612,19 @@ blockquote {
   -webkit-user-drag: none;
   user-drag: none;
 }
+
+.item-data-image {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.item-data-image img {
+    width: 45%;
+    height: auto;
+}
+
+@media (max-width: 600px) {
+    .item-data-image img {
+        width: 100%;
+    }
+}

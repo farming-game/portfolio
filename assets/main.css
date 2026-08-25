@@ -287,26 +287,6 @@ pre code {
   }
 }
 
-
-/* THEME */
-
-.theme-toggle {
-  border: 0;
-  background: transparent;
-  color: var(--text);
-  font-size: 17px;
-  cursor: pointer;
-  padding: 4px;
-  line-height: 1;
-  transition: transform 0.2s ease, color 0.2s ease;
-}
-
-.theme-toggle:hover {
-  transform: rotate(15deg);
-  color: var(--muted);
-}
-
-
 /* DARK MODE */
 
 body.dark-mode {

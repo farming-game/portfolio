@@ -156,8 +156,14 @@ code {
   font-size: 0.92em;
 }
 
+/* Wrapper um Codeblöcke (z.B. Jekyll Rouge .highlight) trägt jetzt den Abstand,
+   damit Margins nicht kollabieren und der Abstand nach JEDEM Codeblock konsistent ist */
+.highlight {
+  margin: 28px 0 32px;
+}
+
 pre {
-  margin: 24px 0 0;
+  margin: 28px 0 32px;
   padding: 22px;
   overflow-x: auto;
   border: 1px solid var(--line);
@@ -165,6 +171,10 @@ pre {
   background: #fafafa;
   font-size: 14px;
   line-height: 1.6;
+}
+
+.highlight pre {
+  margin: 0;
 }
 
 pre code {
@@ -178,6 +188,14 @@ pre code {
 
 .divider {
   display: none;
+}
+
+/* Bilder im Content bekommen etwas Luft nach oben/unten */
+.content img {
+  margin: 28px 0;
+  border-radius: 8px;
+  max-width: 100%;
+  height: auto;
 }
 
 
@@ -402,7 +420,7 @@ body.dark-mode pre {
 /* BLOCKQUOTE */
 
 blockquote {
-  margin: 24px 0;
+  margin: 32px 0;
   padding: 4px 20px;
   border-left: 3px solid var(--line);
   color: var(--muted);
@@ -482,6 +500,16 @@ blockquote {
   gap: 20px;
 }
 
+/* Zwei-Spalten-Sektion (Code | Bild), z.B. "Item Data"-Beispiel im Content */
+.code-image-flex {
+  margin: 28px 0 32px;
+}
+
+.code-image-flex .highlight,
+.code-image-flex pre {
+  margin: 0;
+}
+
 
 /* MOBILE */
 
@@ -508,12 +536,38 @@ blockquote {
   }
 
   .project-meta div {
-    padding: 16px 12px 16px 0;
+    padding: 16px 14px;
   }
 
   .game-image {
     width: 100% !important;
     border-radius: 12px !important;
+  }
+
+  .highlight,
+  pre {
+    margin: 20px 0 24px;
+  }
+
+  pre {
+    padding: 16px;
+    font-size: 13px;
+    border-radius: 6px;
+  }
+
+  .content img {
+    margin: 20px 0;
+    border-radius: 6px;
+  }
+
+  /* Zwei-Spalten Code/Bild-Sektionen stapeln sich auf Mobile untereinander */
+  .code-image-flex {
+    flex-direction: column !important;
+    margin: 20px 0 24px;
+  }
+
+  .code-image-flex > div {
+    width: 100% !important;
   }
 }
 
@@ -568,4 +622,13 @@ blockquote {
   font-weight: 650;
   letter-spacing: normal;
   text-transform: none;
+}
+
+.content img,
+.game-image {
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
 }

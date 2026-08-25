@@ -1,6 +1,6 @@
 ---
 layout: home
-title: Survival Spiel
+title: Survival Game
 ---
 
 <div class="project-meta">
@@ -11,16 +11,16 @@ title: Survival Spiel
   </div>
 
 <div class="meta-item">
-  <span>EIGENER C++-CODE</span>
+  <span>OWN C++ CODE</span>
   <strong class="meta-value meta-value-wrap">
-    <span class="meta-approx">ca.</span>
+    <span class="meta-approx">~</span>
     <span class="count-up" data-target="7500">0</span>
   </strong>
-  <strong class="meta-suffix">Zeilen</strong>
+  <strong class="meta-suffix">Lines</strong>
 </div>
 
   <div class="meta-item">
-    <span>Programmiersprache</span>
+    <span>Language</span>
     <strong class="meta-value">C++</strong>
   </div>
 
@@ -31,22 +31,22 @@ title: Survival Spiel
 
 </div>
 
-> **Hinweis zum Quellcode.**  
-> Da sich das Projekt in aktiver Entwicklung befindet und langfristig veröffentlicht werden soll, ist der vollständige Quellcode nicht öffentlich. Die gezeigten Ausschnitte stammen aus dem produktiven Projekt und wurden auf die für dieses Portfolio relevanten Architekturentscheidungen reduziert.
+> **Note on the source code.**  
+> Since this project is under active development and is intended for eventual release, the full source code is not public. The snippets shown here are taken from the production project and have been narrowed down to the architectural decisions relevant to this portfolio.
 
-## Überblick
+## Overview
 
-Seit August 2024 entwickle ich eigenständig ein Survival-Spiel mit Unreal Engine 5 und C++. Aus einem zunächst kleinen Lernprojekt entstand dabei ein umfangreiches Softwaresystem mit ca. 7.500 Zeilen eigenem C++-Code.
+Since August 2024, I've been independently developing a survival game with Unreal Engine 5 and C++. What started as a small learning project grew into an extensive software system with roughly 7,500 lines of my own C++ code.
 
-Mit wachsendem Funktionsumfang stiegen auch die Anforderungen an die Architektur. Bestehende Systeme wurden deshalb mehrfach refaktoriert, um Verantwortlichkeiten klarer zu trennen, direkte Abhängigkeiten zu reduzieren und Komponenten wiederverwendbar zu machen.
+As the feature set grew, so did the demands on the architecture. Existing systems were therefore refactored multiple times to separate responsibilities more clearly, reduce direct dependencies, and make components reusable.
 
-Ein zentraler Teil des Projekts ist dabei die kontinuierliche Weiterentwicklung der Architektur: Entscheidungen werden nicht nur nach ihrer aktuellen Funktionalität bewertet, sondern auch danach, wie gut sie sich unter wachsender Komplexität erweitern und warten lassen.
+A central part of the project is the continuous evolution of the architecture: decisions aren't judged only by their current functionality, but also by how well they can be extended and maintained as complexity grows.
 
-## Architektur
+## Architecture
 
-### Von Klassenexplosion zu datengetriebenem Design
+### From Class Explosion to Data-Driven Design
 
-Im Initial Commit war jede Ressource im Spiel eine eigene Actor-Subklasse. `ACoal`, `AIron`, `AGold`, `ADiamond`, `AStone` und `ATree` erbten alle von `ACollect` und unterschieden sich nur durch fest verdrahtete Konstruktor-Parameter:
+In the initial commit, every resource in the game was its own Actor subclass. `ACoal`, `AIron`, `AGold`, `ADiamond`, `AStone`, and `ATree` all inherited from `ACollect` and differed only by hardcoded constructor parameters:
 
 <div class="highlight">
 <pre><code><span class="c1">// Tree.cpp</span>
@@ -58,9 +58,9 @@ Im Initial Commit war jede Ressource im Spiel eine eigene Actor-Subklasse. `ACoa
 <span class="p">...</span></code></pre>
 </div>
 
-Sechs praktisch identische Klassen, deren einziger Unterschied drei hartcodierte Werte im Konstruktor sind – jede neue Ressource bedeutete eine neue C++-Klasse plus Blueprint.
+Six practically identical classes, whose only difference was three hardcoded values in the constructor — every new resource meant a new C++ class plus a Blueprint.
 
-Bereits im zweiten Commit sind diese Subklassen verschwunden. Stattdessen gibt es eine einzige, parametrisierte `ACollect`-Klasse, die über einen Enum-Typ (`ECollectables`) und eine `FCollectable`-Struktur beschrieben wird:
+By the second commit, these subclasses were already gone. Instead, there's a single, parameterized `ACollect` class, described via an enum type (`ECollectables`) and an `FCollectable` struct:
 
 <div class="highlight">
 <pre><code><span class="c1">// Collect.h</span>
@@ -94,13 +94,13 @@ Bereits im zweiten Commit sind diese Subklassen verschwunden. Stattdessen gibt e
 <span class="p">};</span></code></pre>
 </div>
 
-Neue Ressourcentypen benötigen seitdem keine eigene C++-Klasse mehr, sondern werden über die vorhandene Struktur und Daten konfiguriert.
+Since then, new resource types no longer require a dedicated C++ class — they're configured through the existing structure and data instead.
 
-![Beschreibung des Bildes](assets/images/Collectable.PNG)
+![Description of the image](assets/images/Collectable.PNG)
 
-### Verantwortlichkeiten durch Components trennen
+### Separating Responsibilities Through Components
 
-Wiederverwendbare Verantwortlichkeiten wurden in eigene Komponentenklassen ausgelagert, die sich an beliebige Objekte im Spiel anhängen lassen. Die Verantwortlichkeiten wurden gezielt auf separate Komponenten aufgeteilt, sodass die einzelnen Funktionen unabhängig voneinander wiederverwendet werden können.
+Reusable responsibilities were extracted into their own component classes that can be attached to any object in the game. Responsibilities were deliberately split across separate components so that individual functions can be reused independently of one another.
 
 <div class="highlight">
 <pre><code><span class="c1">// CollectableComponent.h</span>
@@ -138,11 +138,11 @@ Wiederverwendbare Verantwortlichkeiten wurden in eigene Komponentenklassen ausge
 <span class="p">};</span></code></pre>
 </div>
 
-`UCollectableComponent` kapselt ausschließlich die Collectable-Daten eines Objekts, `UProgressComponent` ausschließlich die Fortschrittsanzeige beim Abbauen. Beide sind unabhängig voneinander wiederverwendbar, ohne dass ein Objekt, das nur eine der beiden Funktionen braucht, die andere mitschleppen muss.
+`UCollectableComponent` encapsulates exclusively the collectable data of an object, while `UProgressComponent` handles exclusively the progress display while harvesting. Both are independently reusable, so an object that only needs one of the two functions doesn't have to carry the other along.
 
-### Auflösung eines "God-Managers" in fokussierte Subsysteme
+### Resolving a "God Manager" Into Focused Subsystems
 
-Damit mehrere Systeme miteinander kommunizieren können, wurde ein `UItemCollectionManager` eingeführt. Mit der Zeit wuchs er jedoch zu einer God-Class heran, da er direkte Abhängigkeiten zu Character-, Controller-, Equipment-, Inventory- und Collect-Klassen besaß:
+To let several systems communicate with each other, a `UItemCollectionManager` was introduced. Over time it grew into a god class, holding direct dependencies on the Character, Controller, Equipment, Inventory, and Collect classes:
 
 <div class="highlight">
 <pre><code><span class="cpp-macro">UCLASS</span><span class="p">()</span>
@@ -167,7 +167,7 @@ Damit mehrere Systeme miteinander kommunizieren können, wurde ein `UItemCollect
 <span class="p">};</span></code></pre>
 </div>
 
-Durch ein Refactoring wurde der `UItemCollectionManager` aufgeteilt in einen `UEquipmentManager` (reine Equipment-Logik) und einen `UPlayerInventoryManager` (reine Inventar-Verwaltung). Dadurch wurden die Verantwortlichkeiten klar getrennt und direkte Abhängigkeiten zwischen den beteiligten Systemen reduziert.
+Through a refactor, `UItemCollectionManager` was split into a `UEquipmentManager` (pure equipment logic) and a `UPlayerInventoryManager` (pure inventory management). This cleanly separated responsibilities and reduced direct dependencies between the involved systems.
 
 <div class="highlight">
 <pre><code><span class="cpp-macro">UCLASS</span><span class="p">()</span>
@@ -212,35 +212,35 @@ Durch ein Refactoring wurde der `UItemCollectionManager` aufgeteilt in einen `UE
 <span class="p">};</span></code></pre>
 </div>
 
-Durch eventbasierte Kommunikation habe ich direkte Abhängigkeiten zwischen den beteiligten Subsystemen reduziert. Das Inventory-System muss seine Konsumenten nicht mehr kennen: Es veröffentlicht Änderungen über Delegates, auf die interessierte Systeme und Widgets unabhängig reagieren können. Das reduziert die direkte Kopplung zwischen den beteiligten Systemen.
+Through event-based communication, I reduced direct dependencies between the involved subsystems. The inventory system no longer needs to know its consumers: it publishes changes via delegates that interested systems and widgets can react to independently. This reduces the direct coupling between the involved systems.
 
 <div class="highlight">
 <pre><code><span class="cpp-macro">DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam</span><span class="p">(</span><span class="cpp-class">FOnInventoryChanged</span><span class="p">,</span> <span class="k">const</span> <span class="cpp-class">TArray</span><span class="o">&lt;</span><span class="cpp-class">FItem</span><span class="o">&gt;&amp;</span><span class="p">,</span> <span class="n">Inventory</span><span class="p">);</span></code></pre>
 </div>
 
-`UEquipmentManager` und `UPlayerInventoryManager` kennen sich dadurch nicht gegenseitig. Beide reagieren lediglich auf relevante Events, die beispielsweise vom Inventory oder der Hotbar ausgelöst werden. Änderungen an einem System können dadurch erfolgen, ohne die abhängigen Systeme direkt anpassen zu müssen.
+As a result, `UEquipmentManager` and `UPlayerInventoryManager` don't know about each other. Both simply react to relevant events, triggered for example by the inventory or the hotbar. Changes to one system can happen without directly modifying the dependent systems.
 
-## Die größte Herausforderung
+## The Biggest Challenge
 
-Das Inventory-System entwickelte sich zum komplexesten zusammenhängenden Teil des Projekts. Mit wachsendem Funktionsumfang kamen neben der eigentlichen Inventarverwaltung auch Interaktionslogik, eine Hotbar und mehrere UI-Komponenten hinzu. In der ursprünglichen Architektur lagen diese Verantwortlichkeiten weitgehend in einer Klasse und waren dadurch stark miteinander gekoppelt.
+The inventory system grew into the most complex, interconnected part of the project. As the feature set grew, interaction logic, a hotbar, and several UI components were added on top of the core inventory management. In the original architecture, these responsibilities largely lived in a single class and were tightly coupled as a result.
 
-Um die entstehende Komplexität zu reduzieren, wurde das System in mehreren Schritten refaktoriert.
+To reduce the resulting complexity, the system was refactored in several steps.
 
-### 1. Entkopplung der UI durch Events
+### 1. Decoupling the UI Through Events
 
-Zunächst wurde die direkte Abhängigkeit zwischen Inventory und UI entfernt. Das Inventory veröffentlicht Änderungen über Events, auf die die Widgets reagieren.
+First, the direct dependency between the inventory and the UI was removed. The inventory publishes changes via events that the widgets react to.
 
-Dadurch kennt das Inventory seine UI-Konsumenten nicht mehr und die Darstellung kann unabhängig von der Datenhaltung weiterentwickelt werden.
+As a result, the inventory no longer knows its UI consumers, and the presentation can evolve independently of the data layer.
 
 <div class="highlight">
 <pre><code><span class="n">MyInventory</span><span class="o">-&gt;</span><span class="n">OnInventoryChanged</span><span class="p">.</span><span class="cpp-function">AddDynamic</span><span class="p">(</span> <span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="cpp-class">UInventoryWidget</span><span class="o">::</span><span class="cpp-function">PopulateInventory</span> <span class="p">);</span></code></pre>
 </div>
 
-### 2. Separate Hotbar durch Spezialisierung
+### 2. A Separate Hotbar Through Specialization
 
-Die Hotbar verwendet die gemeinsame Inventarlogik von `UInventory`, benötigt aber zusätzliche Regeln für die aktive Slot-Auswahl und das Scrollverhalten.
+The hotbar uses the shared inventory logic of `UInventory`, but needs additional rules for active slot selection and scroll behavior.
 
-Statt diese Sonderfälle in `UInventory` zu integrieren, wurde `UHotbar` als Spezialisierung von `UInventory` eingeführt. Die gemeinsame Funktionalität bleibt dadurch zentral in der Basisklasse, während die Hotbar nur ihr spezifisches Verhalten ergänzt.
+Rather than integrating these special cases into `UInventory`, `UHotbar` was introduced as a specialization of `UInventory`. Shared functionality stays centralized in the base class, while the hotbar only adds its specific behavior.
 
 <div class="highlight">
 <pre><code><span class="c1">// Hotbar.h</span>
@@ -262,11 +262,11 @@ Statt diese Sonderfälle in `UInventory` zu integrieren, wurde `UHotbar` als Spe
 <span class="p">};</span></code></pre>
 </div>
 
-### 3. Zentraler Datenzugriff über DataTableManager
+### 3. Centralized Data Access via DataTableManager
 
-Mit zunehmender Anzahl an Systemen stieg auch die Anzahl der benötigten DataTables. Statt die Tabellen in verschiedenen Klassen einzeln zu referenzieren und zu laden, wurde ein zentraler `UDataTableManager` eingeführt.
+As the number of systems grew, so did the number of required DataTables. Instead of referencing and loading tables individually across various classes, a central `UDataTableManager` was introduced.
 
-Der Manager stellt eine einheitliche Schnittstelle für den Zugriff auf unterschiedliche Tabellen bereit. Die DataTables werden beim ersten Zugriff geladen und anschließend für die Lebensdauer der `GameInstance` gecached. Dadurch müssen die einzelnen Systeme weder wissen, wo die Tabellen konfiguriert sind, noch sich um deren Lade- und Cache-Zustand kümmern.
+The manager provides a unified interface for accessing different tables. DataTables are loaded on first access and then cached for the lifetime of the `GameInstance`. This means individual systems don't need to know where the tables are configured, nor manage their loading and cache state.
 
 <div class="highlight">
 <pre><code><span class="c1">// DataTableManager.h</span>
@@ -284,20 +284,20 @@ Der Manager stellt eine einheitliche Schnittstelle für den Zugriff auf untersch
 <span class="p">};</span></code></pre>
 </div>
 
-Durch die Template-basierte Schnittstelle kann derselbe Zugriff für unterschiedliche Row-Typen verwendet werden:
+Thanks to the template-based interface, the same access pattern can be used for different row types:
 
 <div class="highlight">
 <pre><code><span class="k">const</span> <span class="cpp-class">FItem</span><span class="o">*</span> <span class="n">Item</span> <span class="o">=</span> <span class="cpp-class">DataTableManager</span><span class="o">-&gt;</span><span class="cpp-function">FindRow</span><span class="o">&lt;</span><span class="cpp-class">FItem</span><span class="o">&gt;</span><span class="p">(</span><span class="cpp-class">EDataTable</span><span class="o">::</span><span class="n">Items</span><span class="p">,</span> <span class="cpp-class">EItemID</span><span class="o">::</span><span class="n">wood</span><span class="p">);</span></code></pre>
 </div>
 
-Damit bleibt der konkrete Zugriff auf DataTables von den Gameplay-Systemen getrennt und erfolgt über eine zentrale, einheitliche API.
+This keeps the concrete DataTable access separate from the gameplay systems and routed through a single, unified API.
 <br>
 <br>
-#### Beispiel: Item-Daten
+#### Example: Item Data
 
 <div style="display: flex; gap: 20px; align-items: flex-start;">
 
-    <!-- Linke Seite: Code -->
+    <!-- Left side: Code -->
     <div style="width: 50%;">
         <div class="highlight">
             <pre><code><span class="c1">// Data.h</span>
@@ -317,20 +317,20 @@ Damit bleibt der konkrete Zugriff auf DataTables von den Gameplay-Systemen getre
         </div>
     </div>
 
-    <!-- Rechte Seite: Bild -->
+    <!-- Right side: Image -->
     <div style="width: 50%;">
-        <img src="assets/images/Brown_Cap.PNG" alt="Beschreibung" style="width: 100%; height: auto;">
+        <img src="assets/images/Brown_Cap.PNG" alt="Description" style="width: 100%; height: auto;">
     </div>
 
 </div>
 
-### 4. Auslagerung der Interaktionslogik
+### 4. Extracting the Interaction Logic
 
-Ein weiterer Problembereich war die eigentliche Interaktion mit Items: Verschieben, Stapeln, Aufteilen und Tauschen.
+Another problem area was the actual interaction with items: moving, stacking, splitting, and swapping.
 
-Diese Logik lag ursprünglich direkt im Inventory. Dadurch war die Interaktion auf ein einzelnes Inventar zugeschnitten. Ein Item zwischen Spielerinventar und Hotbar oder zwischen zwei beliebigen Inventaren zu verschieben, erforderte zusätzliche Sonderfälle.
+This logic originally lived directly inside the inventory. As a result, interaction was tailored to a single inventory. Moving an item between the player's inventory and the hotbar, or between any two inventories, required additional special cases.
 
-Die Interaktionslogik wurde deshalb in `UInventoryInteraction` ausgelagert. Die Klasse arbeitet mit dem jeweils betroffenen `UInventory` und kann dadurch Operationen unabhängig davon ausführen, welchem konkreten Inventar die Slots gehören.
+The interaction logic was therefore extracted into `UInventoryInteraction`. The class operates on whichever `UInventory` is affected, allowing it to perform operations independently of which concrete inventory the slots belong to.
 
 <div class="highlight">
 <pre><code><span class="c1">// InventoryInteraction.h</span>
@@ -357,13 +357,13 @@ Die Interaktionslogik wurde deshalb in `UInventoryInteraction` ausgelagert. Die 
 <span class="p">};</span></code></pre>
 </div>
 
-### 5. Koordination mehrerer Inventare
+### 5. Coordinating Multiple Inventories
 
-Mit mehreren Inventaren entstand ein weiteres Problem: Beim Aufsammeln eines Items muss nicht nur geprüft werden, ob ein bestimmtes Inventar Platz bietet, sondern welches der verfügbaren Inventare das Item aufnehmen kann.
+With multiple inventories came another problem: when picking up an item, it's not enough to check whether one specific inventory has room — you need to determine which of the available inventories can actually accept the item.
 
-Diese Entscheidung wurde aus `UInventory` herausgehalten und in einen `UPlayerInventoryManager` ausgelagert. Der Manager verwaltet die registrierten Inventare und koordiniert das Hinzufügen eines Items. Er prüft, ob ein passender Stack oder freier Slot vorhanden ist, und delegiert die eigentliche Inventaroperation an das jeweilige `UInventory`.
+This decision was moved out of `UInventory` and into a `UPlayerInventoryManager`. The manager keeps track of the registered inventories and coordinates adding an item. It checks whether a matching stack or free slot exists, and delegates the actual inventory operation to the respective `UInventory`.
 
-Damit bleibt `UInventory` für die Verwaltung eines einzelnen Inventars verantwortlich, während der Manager die Zusammenarbeit mehrerer Inventare koordiniert.
+This keeps `UInventory` responsible for managing a single inventory, while the manager coordinates the collaboration between multiple inventories.
 
 <div class="highlight">
 <pre><code><span class="c1">// PlayerInventoryManager.h</span>
@@ -385,10 +385,10 @@ Damit bleibt `UInventory` für die Verwaltung eines einzelnen Inventars verantwo
 <span class="p">};</span></code></pre>
 </div>
 
-## Fazit
+## Conclusion
 
-Das Projekt hat mir gezeigt, dass Architektur mit dem System wachsen muss.
+This project taught me that architecture has to grow with the system.
 
-Mehrfach stießen ursprüngliche Lösungen mit wachsendem Funktionsumfang an ihre Grenzen. Durch gezielte Refactorings konnten Verantwortlichkeiten getrennt, Abhängigkeiten reduziert und Systeme wiederverwendbarer gemacht werden.
+Time and again, the original solutions hit their limits as the feature set grew. Through targeted refactoring, I was able to separate responsibilities, reduce dependencies, and make systems more reusable.
 
-Für mich gehört deshalb nicht nur das Entwerfen neuer Systeme zur Softwareentwicklung, sondern auch das kritische Hinterfragen und Weiterentwickeln bestehenden Codes.
+For me, software development isn't just about designing new systems — it's also about critically questioning and evolving existing code.
